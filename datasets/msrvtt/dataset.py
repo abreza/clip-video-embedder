@@ -20,7 +20,7 @@ class MSRVTTDataset(Dataset):
 
         for video in data['videos']:
             try:
-                video_path = path_to_videos+video['video_id']+'mp4'
+                video_path = path_to_videos+video['video_id']+'.mp4'
 
                 #video_path = download_video_from_youtube(video['url'])
 
