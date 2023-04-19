@@ -8,7 +8,7 @@ from torchvision.transforms import ToTensor
 from utils.video_loader import download_video_from_youtube
 
 class MSRVTTDataset(Dataset):
-    def __init__(self, path_to_videos,json_path transform=None):
+    def __init__(self, path_to_videos,json_path, transform=None):
         self.transform = transform if transform else ToTensor()
 
         with open(json_path) as f:
