@@ -17,7 +17,9 @@ class MSRVTTDataset(Dataset):
         with open(json_path) as f:
             data = json.load(f)
         self.videos = []
+        # self.descriptions = []
 
+        
         for video in data['videos']:
             try:
                 video_path = path_to_videos+video['video_id']+'.mp4'
@@ -34,30 +36,48 @@ class MSRVTTDataset(Dataset):
                         if item["video_id"] == video["video_id"]
                     ]
                 })
-                self.descriptions.append(video['description'])
+                # self.descriptions.append(video['description'])
             except Exception as err:
                 print(err)
 
     def __len__(self):
         return len(self.videos)
 
-    def read_frames(self, video_path, start_time, end_time):
+    def read_frames(self, video_path, start_time, end_time, frame_per_second=2):
         cap = cv2.VideoCapture(video_path)
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        start_frame = int(start_time * fps)
-        end_frame = int(end_time * fps)
-        frames = []
 
-        for i in range(start_frame, end_frame):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        # sample one frame every `sample_rate` frames
+        sample_rate = round(fps) // frame_per_second
+
+        start_frame, end_frame = map(int, (start_time * fps, end_time * fps))
+
+        
+        sampled_frames = []
+        
+        i = -1
+
+        while(cap.isOpened()):
+            i += 1
+
+            if i<start_frame or i>end_frame:
+                continue
+
             ret, frame = cap.read()
-            if not ret:
+            if ret == False:
                 break
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frames.append(self.transform(frame))
+
+            # only save one frame every sample_rate frames
+            if i % sample_rate == 0: 
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                sampled_frames.append(self.transform(frame))
 
         cap.release()
-        return frames
+        cv2.destroyAllWindows()
+
+        return sampled_frames
+
 
     def __getitem__(self, idx):
         video = self.videos[idx]
