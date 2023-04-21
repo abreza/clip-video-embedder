@@ -1,3 +1,4 @@
+import os
 import json
 import cv2
 import os
@@ -7,21 +8,27 @@ from torch.utils.data import Dataset
 from torchvision.transforms import ToTensor
 from utils.video_loader import download_video_from_youtube
 
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_data_path = os.path.join(current_dir, 'test_videodatainfo.json')
+train_data_path = os.path.join(current_dir, 'train_val_videodatainfo.json')
+
+
 class MSRVTTDataset(Dataset):
-    def __init__(self, path_to_videos,json_path, transform=None):
+    def __init__(self, data_type='train', videos_path=os.path.join(current_dir, 'videos'), transform=None, max_size=None):
         self.transform = transform if transform else ToTensor()
 
-        with open(json_path) as f:
+        data_path = test_data_path if data_type == 'test' else train_data_path
+        with open(data_path) as f:
             data = json.load(f)
         self.videos = []
-        # self.descriptions = []
 
-        
         for video in data['videos']:
+            if max_size and len(self.videos) >= max_size:
+                break
             try:
-                video_path = path_to_videos+video['video_id']+'.mp4'
-
-                #video_path = download_video_from_youtube(video['url'])
+                video_path = download_video_from_youtube(
+                    video['url'], videos_path, f"{video['video_id']}.mp4")
 
                 self.videos.append({
                     "path": video_path,
@@ -33,7 +40,6 @@ class MSRVTTDataset(Dataset):
                         if item["video_id"] == video["video_id"]
                     ]
                 })
-                # self.descriptions.append(video['description'])
             except Exception as err:
                 print(err)
 
@@ -50,15 +56,14 @@ class MSRVTTDataset(Dataset):
 
         start_frame, end_frame = map(int, (start_time * fps, end_time * fps))
 
-        
         sampled_frames = []
-        
+
         i = -1
 
-        while(cap.isOpened()):
+        while (cap.isOpened()):
             i += 1
 
-            if i<start_frame or i>end_frame:
+            if i < start_frame or i > end_frame:
                 continue
 
             ret, frame = cap.read()
@@ -66,7 +71,7 @@ class MSRVTTDataset(Dataset):
                 break
 
             # only save one frame every sample_rate frames
-            if i % sample_rate == 0: 
+            if i % sample_rate == 0:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 sampled_frames.append(self.transform(frame))
 
@@ -74,7 +79,6 @@ class MSRVTTDataset(Dataset):
         cv2.destroyAllWindows()
 
         return sampled_frames
-
 
     def __getitem__(self, idx):
         video = self.videos[idx]

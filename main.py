@@ -9,28 +9,26 @@ from modules.frame_sampler.clip_saliency_frame_sampler.train import train_salien
 
 import argparse
 
+
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_set_path', type=str, required=True, help='Path to tarinset videos')
-    parser.add_argument('--test_set_path', type=str, required=True, help='Path to tarinset videos')
+    parser.add_argument('--train_set_path', type=str,
+                        required=True, help='Path to tarinset videos')
+    parser.add_argument('--test_set_path', type=str,
+                        required=True, help='Path to tarinset videos')
     args = parser.parse_args()
     return vars(args)
-
 
 
 def main():
     args = get_args()
     train_set_path = args['train_set_path']
-    test_set_path  = args['test_set_path']
+    test_set_path = args['test_set_path']
 
-
-    trainset_json_path = 'datasets/msrvtt/train_val_videodatainfo.json'
-    testset_json_path  = 'datasets/msrvtt/test_videodatainfo.json'
-
-    msr_vtt_trainset = MSRVTTDataset(train_set_path, trainset_json_path)
+    msr_vtt_trainset = MSRVTTDataset(train_set_path)
     train_dataloader = DataLoader(msr_vtt_trainset, batch_size=1)
 
-    msr_vtt_testset = MSRVTTDataset(test_set_path, testset_json_path)
+    msr_vtt_testset = MSRVTTDataset(test_set_path)
     val_dataloader = DataLoader(msr_vtt_testset, batch_size=1)
 
     saliency_net = SaliencyNet()
@@ -41,7 +39,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     train_salient_frame_sampler(clip_teacher, saliency_net,
                                 train_dataloader, val_dataloader,
-                                 epochs=10, optimizer=optimizer, device=device)
+                                epochs=10, optimizer=optimizer, device=device)
 
 
 if __name__ == '__main__':

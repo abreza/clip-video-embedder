@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
 
-from .model import CLIPTeacher, SaliencyNet
+from torch.utils.data import DataLoader
 
 
 def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, val_dataloader: DataLoader, epochs: int, optimizer, device):
@@ -12,6 +11,8 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
     student.to(device)
 
     criterion = nn.MSELoss()
+
+    num_samples = 10
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -48,4 +49,5 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
                 running_val_loss += val_loss.item()
 
             val_loss = running_val_loss / len(val_dataloader)
-            print(f"Epoch {epoch + 1}/{epochs}, Validation Loss: {val_loss:.4f}")
+            print(
+                f"Epoch {epoch + 1}/{epochs}, Validation Loss: {val_loss:.4f}")
