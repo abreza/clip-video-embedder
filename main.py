@@ -1,45 +1,30 @@
-import torch
-from torch.utils.data import DataLoader
+from utils.dotdict import DotNotationDict
 
-from datasets.msrvtt.dataset import MSRVTTDataset
+from dataloaders.data_dataloaders import DATALOADER_DICT
 
-from modules.frame_sampler.clip_saliency_frame_sampler.model import SaliencyNet, CLIPTeacher
-from modules.frame_sampler.clip_saliency_frame_sampler.train import train_salient_frame_sampler
-
-
-import argparse
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--train_set_path', type=str,
-                        required=True, help='Path to tarinset videos')
-    parser.add_argument('--test_set_path', type=str,
-                        required=True, help='Path to tarinset videos')
-    args = parser.parse_args()
-    return vars(args)
+from transformers import CLIPTokenizer
 
 
 def main():
-    args = get_args()
-    train_set_path = args['train_set_path']
-    test_set_path = args['test_set_path']
+    tokenizer = CLIPTokenizer.from_pretrained("clip-vit-large-patch14")
 
-    msr_vtt_trainset = MSRVTTDataset(train_set_path)
-    train_dataloader = DataLoader(msr_vtt_trainset, batch_size=1)
+    train_args = DotNotationDict({
+        "train_csv": 'MSRVTT_train.9k.csv',
+        "data_path": 'MSRVTT_data.json',
+        "features_path": 'MSRVTT_Videos',
+        "max_words": 32,
+        "feature_framerate": 1,
+        "max_frames": 100,
+        "expand_msrvtt_sentences": True,
+        "train_frame_order": 0,
+        "slice_framepos": 2,
+        "batch_size": 128,
+        "n_gpu": 1,
+        "num_thread_reader": 0,
+    })
 
-    msr_vtt_testset = MSRVTTDataset(test_set_path)
-    val_dataloader = DataLoader(msr_vtt_testset, batch_size=1)
-
-    saliency_net = SaliencyNet()
-    clip_teacher = CLIPTeacher()
-
-    optimizer = torch.optim.Adam(saliency_net.parameters(), lr=1e-4)
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    train_salient_frame_sampler(clip_teacher, saliency_net,
-                                train_dataloader, val_dataloader,
-                                epochs=10, optimizer=optimizer, device=device)
+    train_dataloader, train_length = DATALOADER_DICT['msrvtt']["train"](
+        train_args, tokenizer)
 
 
 if __name__ == '__main__':
