@@ -3,5 +3,5 @@ params = dict(
     data_dir='MSRVTT',
     videos_dir='MSRVTT/videos',
     test_csv='./MSRVTT_JSFUSION_test.csv',
-    json_data='./MSRVTT_data.json'
+    json_data='./MSRVTT_data.json',
 )
