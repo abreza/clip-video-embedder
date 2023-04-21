@@ -1,11 +1,6 @@
-class DotNotationDict(dict):
-    """Enables dot notation access to dictionary attributes."""
-
-    def getattr(self, key):
-        return self.get(key)
+class DotDict(dict):
+    def __getattr__(self, attr):
+        return self.get(attr)
 
     def __setattr__(self, key, value):
-        self.__setitem__(key, value)
-
-    def __delattr__(self, key):
-        self.__delitem__(key)
+        self[key] = value

@@ -1,4 +1,4 @@
-from utils.dotdict import DotNotationDict
+from utils.dotdict import DotDict
 
 from dataloaders.data_dataloaders import DATALOADER_DICT
 
@@ -6,9 +6,9 @@ from transformers import CLIPTokenizer
 
 
 def main():
-    tokenizer = CLIPTokenizer.from_pretrained("clip-vit-large-patch14")
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 
-    train_args = DotNotationDict({
+    train_args = DotDict({
         "train_csv": 'MSRVTT_train.9k.csv',
         "data_path": 'MSRVTT_data.json',
         "features_path": 'MSRVTT_Videos',
