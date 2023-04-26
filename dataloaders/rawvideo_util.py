@@ -18,8 +18,8 @@ class RawVideoExtractorCV2():
             CenterCrop(n_px),
             lambda image: image.convert("RGB"),
             ToTensor(),
-            Normalize((0.48145466, 0.4578275, 0.40821073),
-                      (0.26862954, 0.26130258, 0.27577711)),
+            # Normalize((0.48145466, 0.4578275, 0.40821073),
+            #           (0.26862954, 0.26130258, 0.27577711)),
         ])
 
     def video_to_tensor(self, video_file, preprocess, sample_fp=0, start_time=None, end_time=None):
