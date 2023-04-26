@@ -16,7 +16,7 @@ class RawVideoExtractorCV2():
         return Compose([
             Resize(n_px, interpolation=Image.BICUBIC),
             CenterCrop(n_px),
-            lambda image: image.convert("RGB"),
+        lambda image: image.convert("RGB"),
             ToTensor(),
 
             #TODO: The image to be converted to a PIL image contains values outside the range [0, 1]
@@ -30,45 +30,33 @@ class RawVideoExtractorCV2():
                 and start_time > -1 and end_time > start_time
         assert sample_fp > -1
 
-        # Samples a frame sample_fp X frames.
         cap = cv2.VideoCapture(video_file)
-        frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
 
-        total_duration = (frameCount + fps - 1) // fps
-        start_sec, end_sec = 0, total_duration
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        video_fps = cap.get(cv2.CAP_PROP_FPS)
 
-        if start_time is not None:
-            start_sec, end_sec = start_time, end_time if end_time <= total_duration else total_duration
-            cap.set(cv2.CAP_PROP_POS_FRAMES, int(start_time * fps))
+        start_frame = int(start_time * video_fps) if start_time else  0
+        end_frame = int(end_time * video_fps) if end_time else frame_count - 1
 
         interval = 1
         if sample_fp > 0:
-            interval = fps // sample_fp
+            interval = video_fps // sample_fp
         else:
-            sample_fp = fps
+            sample_fp = video_fps
         if interval == 0:
             interval = 1
 
-        inds = [ind for ind in np.arange(0, fps, interval)]
-        assert len(inds) >= sample_fp
-        inds = inds[:sample_fp]
+        images = []
 
-        ret = True
-        images, included = [], []
+        for i in range(frame_count):
+            ret, frame = cap.read()
 
-        for sec in np.arange(start_sec, end_sec + 1):
-            if not ret:
-                break
-            sec_base = int(sec * fps)
-            for ind in inds:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, sec_base + ind)
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                images.append(preprocess(
-                    Image.fromarray(frame_rgb).convert("RGB")))
+            if ret:
+                if i >= start_frame and i <= end_frame:
+                    if i % interval == 0:
+                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        images.append(Image.fromarray(frame_rgb).convert("RGB"))
+            else: break
 
         cap.release()
 
