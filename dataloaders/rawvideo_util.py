@@ -16,12 +16,10 @@ class RawVideoExtractorCV2():
         return Compose([
             Resize(n_px, interpolation=Image.BICUBIC),
             CenterCrop(n_px),
-        lambda image: image.convert("RGB"),
+            lambda image: image.convert("RGB"),
             ToTensor(),
-
-            #TODO: The image to be converted to a PIL image contains values outside the range [0, 1]
-            # Normalize((0.48145466, 0.4578275, 0.40821073),
-            #           (0.26862954, 0.26130258, 0.27577711)),
+            Normalize((0.48145466, 0.4578275, 0.40821073),
+                      (0.26862954, 0.26130258, 0.27577711)),
         ])
 
     def video_to_tensor(self, video_file, preprocess, sample_fp=0, start_time=None, end_time=None):
@@ -55,8 +53,9 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if i % interval == 0:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        images.append(Image.fromarray(frame_rgb).convert("RGB"))
-            else: break
+                        images.append(preprocess(Image.fromarray(frame_rgb).convert("RGB")))
+            else: 
+                break
 
         cap.release()
 
