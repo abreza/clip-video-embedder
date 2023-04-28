@@ -33,31 +33,28 @@ class RawVideoExtractorCV2():
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         video_fps = cap.get(cv2.CAP_PROP_FPS)
 
-        start_frame = int(start_time * video_fps) if start_time else 0
+        start_frame = int(start_time * video_fps) if start_time else  0
         end_frame = int(end_time * video_fps) if end_time else frame_count - 1
 
-        target_fps = sample_fp if sample_fp > 0 else video_fps
-        target_interval = int(round(video_fps / target_fps))
-        if target_interval == 0:
-            target_interval = 1
+        interval = 1
+        if sample_fp > 0:
+            interval = video_fps // sample_fp
+        else:
+            sample_fp = video_fps
+        if interval == 0:
+            interval = 1
 
         images = []
 
-        # loop through each target frame index
-        for i in range(start_frame, end_frame + 1):
-            # set the current frame index
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+        for i in range(frame_count):
             ret, frame = cap.read()
 
             if ret:
-                # get the timestamp of the current frame in milliseconds
-                timestamp_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
-
-                # check whether the current frame should be sampled based on the target interval
-                if (i - start_frame) % target_interval == 0:
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    images.append(Image.fromarray(frame_rgb))
-            else:
+                if i >= start_frame and i <= end_frame:
+                    if i % interval == 0:
+                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        images.append(Image.fromarray(frame_rgb))
+            else: 
                 break
 
         cap.release()
