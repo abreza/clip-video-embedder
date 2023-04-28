@@ -40,7 +40,7 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        images.append(self.processor(images = Image.fromarray(frame_rgb)),return_tensors='pt')
+                        images.append(self.processor(images = Image.fromarray(frame_rgb),return_tensors='pt'))
             else: 
                 break
 
