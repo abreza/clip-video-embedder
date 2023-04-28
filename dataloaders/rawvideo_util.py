@@ -53,17 +53,13 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if i % interval == 0:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        images.append(preprocess(Image.fromarray(frame_rgb).convert("RGB")))
+                        images.append(Image.fromarray(frame_rgb))
             else: 
                 break
 
         cap.release()
 
-        if len(images) > 0:
-            video_data = th.tensor(np.stack(images))
-        else:
-            video_data = th.zeros(1)
-        return {'video': video_data}
+        return {'frames': images}
 
     def get_video_data(self, video_path, start_time=None, end_time=None):
         image_input = self.video_to_tensor(
