@@ -22,7 +22,7 @@ class RawVideoExtractorCV2():
             #           (0.26862954, 0.26130258, 0.27577711)),
         ])
 
-    def video_to_tensor(self, video_file, preprocess, sample_fp=0, start_time=None, end_time=None):
+    def video_to_tensor(self, video_file, sample_fp=0, start_time=None, end_time=None):
         if start_time is not None or end_time is not None:
             assert isinstance(start_time, int) and isinstance(end_time, int) \
                 and start_time > -1 and end_time > start_time
@@ -38,7 +38,7 @@ class RawVideoExtractorCV2():
 
         interval = 1
         if sample_fp > 0:
-            interval = video_fps // sample_fp
+            interval = video_fps / sample_fp
         else:
             sample_fp = video_fps
         if interval == 0:
@@ -51,7 +51,7 @@ class RawVideoExtractorCV2():
 
             if ret:
                 if i >= start_frame and i <= end_frame:
-                    if i % interval == 0:
+                    if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         images.append(Image.fromarray(frame_rgb))
             else: 
@@ -59,7 +59,7 @@ class RawVideoExtractorCV2():
 
         cap.release()
 
-        return {'frames': images}
+        return images
 
     def get_video_data(self, video_path, start_time=None, end_time=None):
         image_input = self.video_to_tensor(
