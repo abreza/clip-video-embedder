@@ -1,26 +1,13 @@
-import torch as th
 import numpy as np
 from PIL import Image
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 import cv2
 
 
 class RawVideoExtractorCV2():
-    def __init__(self, centercrop=False, size=224, framerate=-1, ):
+    def __init__(self, processor, centercrop=False, framerate=-1, ):
         self.centercrop = centercrop
-        self.size = size
         self.framerate = framerate
-        self.transform = self._transform(self.size)
-
-    def _transform(self, n_px):
-        return Compose([
-            Resize(n_px, interpolation=Image.BICUBIC),
-            CenterCrop(n_px),
-            lambda image: image.convert("RGB"),
-            ToTensor(),
-            # Normalize((0.48145466, 0.4578275, 0.40821073),
-            #           (0.26862954, 0.26130258, 0.27577711)),
-        ])
+        self.processor = processor
 
     def video_to_tensor(self, video_file, sample_fp=0, start_time=None, end_time=None):
         if start_time is not None or end_time is not None:
@@ -53,7 +40,7 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        images.append(Image.fromarray(frame_rgb))
+                        images.append(self.processor(images = Image.fromarray(frame_rgb)),return_tensors='pt')
             else: 
                 break
 
