@@ -171,7 +171,7 @@ def dataloader_activity_train(args):
         drop_last=True,
     )
 
-    return dataloader, len(activity_dataset), train_sampler
+    return dataloader, len(activity_dataset)
 
 def dataloader_activity_test(args, tokenizer, subset="test"):
     activity_testset = ActivityNet_DataLoader(

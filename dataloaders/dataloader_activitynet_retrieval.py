@@ -40,12 +40,13 @@ class ActivityNet_DataLoader(Dataset):
 
         self.rawVideoExtractor = RawVideoExtractor(framerate=feature_framerate, size=image_resolution)
 
-
     def __len__(self):
         return len(self.list_data)
 
     def __getitem__(self, feature_idx):
+        print('!!!!!!!!!!!!!!!')
         data = self.list_data[feature_idx]
         descriptions = [item['description'] for item in data['segments']]
         images = self.rawVideoExtractor.get_video_data(data['youtube_video_id'])
+        print(images.shape, len(descriptions))
         return images, descriptions
