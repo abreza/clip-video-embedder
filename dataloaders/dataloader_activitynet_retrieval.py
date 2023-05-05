@@ -46,5 +46,6 @@ class ActivityNet_DataLoader(Dataset):
 
     def __getitem__(self, feature_idx):
         data = self.list_data[feature_idx]
+        descriptions = [item['description'] for item in data['segments']]
         images = self.rawVideoExtractor.get_video_data(data['youtube_video_id'])
-        return data, images
+        return images, descriptions
