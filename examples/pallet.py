@@ -84,5 +84,5 @@ def plot_pallet(model, processor, images=None, sentences=None):
     plt.yticks([])
     plt.xticks([])
 
-    plt.xlim([-1.6, similarity.shape[1] - 0.5])
-    plt.ylim([similarity.shape[0] - 0.5, -1.6])
+    plt.xlim([-1.6, similarity.shape[1] - 0.5]);
+    plt.ylim([similarity.shape[0] - 0.5, -1.6]);
