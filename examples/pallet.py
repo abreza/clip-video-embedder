@@ -8,7 +8,7 @@ def plot_pallet(model, processor, images=None, sentences=None):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device).eval()
-    
+
     if images == None:
         images = []
         processed_images = []
@@ -61,27 +61,26 @@ def plot_pallet(model, processor, images=None, sentences=None):
     else:
         similarity = image_features.cpu().numpy() @ image_features.cpu().numpy().T
 
+        plt.figure(figsize=(14, 10))
+        plt.imshow(similarity, vmin=0.9, vmax=1)
 
-    plt.figure(figsize=(14, 10))
-    plt.imshow(similarity, vmin=0.9, vmax=1)
-
-    for i, image in enumerate(images):
-        plt.imshow(image, extent=(-1.6, -0.6, i - 0.5, i + 0.5), origin="lower")
-        
-    for i, image in enumerate(images):
-        plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
-
-
-    for x in range(similarity.shape[1]):
-        for y in range(similarity.shape[0]):
-            plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
+        for i, image in enumerate(images):
+            plt.imshow(image, extent=(-1.6, -0.6, i - 0.5, i + 0.5), origin="lower")
+            
+        for i, image in enumerate(images):
+            plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
 
 
-    for side in ["left", "top", "right", "bottom"]:
-        plt.gca().spines[side].set_visible(False)
+        for x in range(similarity.shape[1]):
+            for y in range(similarity.shape[0]):
+                plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
 
-    plt.yticks([])
-    plt.xticks([])
 
-    plt.xlim([-1.6, similarity.shape[1] - 0.5]);
-    plt.ylim([similarity.shape[0] - 0.5, -1.6]);
+        for side in ["left", "top", "right", "bottom"]:
+            plt.gca().spines[side].set_visible(False)
+
+        plt.yticks([])
+        plt.xticks([])
+
+        plt.xlim([-1.6, similarity.shape[1] - 0.5]);
+        plt.ylim([similarity.shape[0] - 0.5, -1.6]);
