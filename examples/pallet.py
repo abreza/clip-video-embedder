@@ -6,10 +6,9 @@ import matplotlib.pyplot as plt
 
 def plot_pallet(model, processor, images=None, sentences=None):
     
-    model.to(device).eval()
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+    model.to(device).eval()
+    
     if images == None:
         images = []
         processed_images = []
