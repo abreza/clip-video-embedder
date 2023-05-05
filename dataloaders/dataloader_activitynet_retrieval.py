@@ -20,9 +20,6 @@ class ActivityNet_DataLoader(Dataset):
         self.subset = subset
         assert self.subset in ["train", "val"]
 
-
-        data_path = f'datasets/ActivityNet/{self.subset}.json'
-
         with open(data_path) as f:
             self.data = json.load(f)
 
@@ -44,9 +41,8 @@ class ActivityNet_DataLoader(Dataset):
         return len(self.list_data)
 
     def __getitem__(self, feature_idx):
-        print('!!!!!!!!!!!!!!!')
         data = self.list_data[feature_idx]
         descriptions = [item['description'] for item in data['segments']]
-        images = self.rawVideoExtractor.get_video_data(data['youtube_video_id'])
-        print(images.shape, len(descriptions))
+        video_path = f"/content/clip-video-embedder/datasets/ActivityNet/ActivityNet-minimal-videos/v_{data['youtube_video_id']}.mp4"
+        images = self.rawVideoExtractor.get_video_data(video_path)
         return images, descriptions
