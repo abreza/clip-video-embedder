@@ -5,7 +5,7 @@ from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normal
 
 
 class RawVideoExtractorCV2():
-    def __init__(self, centercrop=False, framerate=-1 size=224 ):
+    def __init__(self, centercrop=False, framerate=-1, size=224 ):
         self.centercrop = centercrop
         self.framerate = framerate
         self.transform = self._transform(size)
