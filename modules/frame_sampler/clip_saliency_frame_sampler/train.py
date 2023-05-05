@@ -27,6 +27,7 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
             student_scores = student(frames)
             
             optimizer.zero_grad()
+            print(student_scores, teacher_scores)
             loss = criterion(student_scores, teacher_scores)
             loss.backward()
             optimizer.step()
