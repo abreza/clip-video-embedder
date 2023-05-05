@@ -18,7 +18,9 @@ def plot_pallet(model, processor, images=None, sentences=None):
         for color in colors:
             image = Image.new('RGB', (224, 224), color)
             images.append(image)
-            processed_images.append(processor(images =image)['pixel_values'])
+    
+
+    processed_images = processor(images =images)['pixel_values']
 
     image_input = torch.squeeze(torch.tensor(np.stack(processed_images)), dim=1).to(device)
 
@@ -61,26 +63,27 @@ def plot_pallet(model, processor, images=None, sentences=None):
     else:
         similarity = image_features.cpu().numpy() @ image_features.cpu().numpy().T
 
-        plt.figure(figsize=(14, 10))
-        plt.imshow(similarity, vmin=0.9, vmax=1)
 
-        for i, image in enumerate(images):
-            plt.imshow(image, extent=(-1.6, -0.6, i - 0.5, i + 0.5), origin="lower")
-            
-        for i, image in enumerate(images):
-            plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
+    plt.figure(figsize=(14, 10))
+    plt.imshow(similarity, vmin=0.9, vmax=1)
 
-
-        for x in range(similarity.shape[1]):
-            for y in range(similarity.shape[0]):
-                plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
+    for i, image in enumerate(images):
+        plt.imshow(image, extent=(-1.6, -0.6, i - 0.5, i + 0.5), origin="lower")
+        
+    for i, image in enumerate(images):
+        plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
 
 
-        for side in ["left", "top", "right", "bottom"]:
-            plt.gca().spines[side].set_visible(False)
+    for x in range(similarity.shape[1]):
+        for y in range(similarity.shape[0]):
+            plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
 
-        plt.yticks([])
-        plt.xticks([])
 
-        plt.xlim([-1.6, similarity.shape[1] - 0.5]);
-        plt.ylim([similarity.shape[0] - 0.5, -1.6]);
+    for side in ["left", "top", "right", "bottom"]:
+        plt.gca().spines[side].set_visible(False)
+
+    plt.yticks([])
+    plt.xticks([])
+
+    plt.xlim([-1.6, similarity.shape[1] - 0.5])
+    plt.ylim([similarity.shape[0] - 0.5, -1.6])
