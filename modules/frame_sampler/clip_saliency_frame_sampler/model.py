@@ -7,14 +7,15 @@ class SaliencyNet(nn.Module):
     def __init__(self):
         super(SaliencyNet, self).__init__()
         self.model = timm.create_model('resnet50', pretrained=True)
-        self.fc1 = nn.Linear(self.model.num_features, 512)
+        self.fc1 = nn.Linear(100352, 512)
         self.fc2 = nn.Linear(512, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, images):
-        features = self.model.forward_features(images)
-        x = self.fc1(features)
+        features = self.model(images)
+        x = features.view(features.size(0), -1)
+        x = self.fc1(x)
         x = self.relu(x)
         x = self.fc2(x)
         x = self.sigmoid(x)
