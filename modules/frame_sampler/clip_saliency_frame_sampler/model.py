@@ -1,4 +1,6 @@
 import timm
+import torch
+import numpy as np
 import torch.nn as nn
 from transformers import CLIPProcessor, CLIPModel
 
@@ -12,8 +14,8 @@ class SaliencyNet(nn.Module):
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
-    def forward(self, images):
-        features = self.model(images)
+    def forward(self, preprocessed_images):
+        features = self.model(preprocessed_images)
         x = features.view(features.size(0), -1)
         x = self.fc1(x)
         x = self.relu(x)
@@ -29,14 +31,19 @@ class CLIPTeacher(nn.Module):
         self.processor = CLIPProcessor.from_pretrained(
             'openai/clip-vit-large-patch14')
 
-    def forward(self, images, descriptions):
-        inputs = self.processor(
-            text=descriptions, images=images, return_tensors="pt", padding=True
-        )
+    def forward(self, preprocessed_images, descriptions):
+        image_inputs = torch.squeeze(torch.tensor(np.stack(preprocessed_images)), dim=1)
 
-        outputs = self.model(**inputs)
-        logits_per_image = outputs.logits_per_image
+        text_inputs = self.processor(text=descriptions, return_tensors="pt", padding=True)
+        
+        image_features = self.model.get_image_features(image_inputs).float()
+        text_features = self.model.get_text_features(**text_inputs).float()
+        
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+        text_features  /= text_features.norm(dim=-1, keepdim=True)
+        
+        similarities = text_features.cpu().numpy() @ image_features.cpu().numpy().T
+        max_similarity = np.max(similarities,axis=0)
+        
+        return max_similarity
 
-        average_scores = logits_per_image.mean(dim=1)
-
-        return average_scores
