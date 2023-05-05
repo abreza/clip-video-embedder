@@ -2,7 +2,7 @@ import os
 import pytube
 
 
-def download_video_from_youtube(video_id_or_url, destination_path=None, video_name=None, retry_count=3):
+def download_video_from_youtube(video_id_or_url, destination_path=None, video_name=None, retry_count=3, use_oauth=False):
     if retry_count == 0:
         raise Exception('Can not download video!')
     try:
@@ -17,7 +17,7 @@ def download_video_from_youtube(video_id_or_url, destination_path=None, video_na
             return video_path
 
         print(f'Downloading YouTube video {video_id}.')
-        pytube.YouTube(video_url).streams.get_highest_resolution().download(
+        pytube.YouTube(video_url, use_oauth=use_oauth, allow_oauth_cache=use_oauth).streams.get_highest_resolution().download(
             destination_path, filename=video_name)
         print(f'Download complete.')
 
