@@ -25,7 +25,7 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
                 teacher_scores = teacher(frames, descriptions)
 
             student_scores = student(frames)
-            print(student_scores, teacher_scores)
+            
             optimizer.zero_grad()
             loss = criterion(student_scores, teacher_scores)
             loss.backward()
@@ -40,11 +40,11 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
         with torch.no_grad():
             running_val_loss = 0.0
             for val_frames, val_descriptions in val_dataloader:
-                val_frames = val_frames.to(device)
-                val_descriptions = val_descriptions.to(device)
+                val_frames = torch.squeeze(torch.tensor(np.stack(val_frames)), dim=1).to(device)
+                val_descriptions = [desc[0] for desc in val_descriptions]
 
-                val_student_scores = student(val_frames).squeeze()
                 val_teacher_scores = teacher(val_frames, val_descriptions)
+                val_student_scores = student(val_frames)
 
                 val_loss = criterion(val_student_scores, val_teacher_scores)
                 running_val_loss += val_loss.item()
