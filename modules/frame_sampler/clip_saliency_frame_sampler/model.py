@@ -15,7 +15,7 @@ class SaliencyNet(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, preprocessed_images):
-        features = self.model(preprocessed_images)
+        features = self.model.forward_features(preprocessed_images)
         x = features.view(features.size(0), -1)
         x = self.fc1(x)
         x = self.relu(x)

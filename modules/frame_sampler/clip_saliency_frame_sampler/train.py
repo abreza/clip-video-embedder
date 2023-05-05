@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 from torch.utils.data import DataLoader
 
@@ -17,13 +18,13 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
     for epoch in range(epochs):
         running_loss = 0.0
         for frames, descriptions in train_dataloader:
-            frames = frames.to(device)
-            descriptions = descriptions.to(device)
-
-            student_scores = student(frames)
+            frames = torch.squeeze(torch.tensor(np.stack(frames)), dim=1).to(device)
+            descriptions = [desc[0] for desc in descriptions]
 
             with torch.no_grad():
                 teacher_scores = teacher(frames, descriptions)
+
+            student_scores = student(frames)
 
             optimizer.zero_grad()
             loss = criterion(student_scores, teacher_scores)
