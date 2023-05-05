@@ -160,14 +160,14 @@ def dataloader_activity_train(args):
         feature_framerate=args.feature_framerate,
     )
 
-    train_sampler = torch.utils.data.distributed.DistributedSampler(activity_dataset)
+    # train_sampler = torch.utils.data.distributed.DistributedSampler(activity_dataset)
     dataloader = DataLoader(
         activity_dataset,
         batch_size=args.batch_size // args.n_gpu,
         num_workers=args.num_thread_reader,
         pin_memory=False,
-        shuffle=(train_sampler is None),
-        sampler=train_sampler,
+        # shuffle=(train_sampler is None),
+        # sampler=train_sampler,
         drop_last=True,
     )
 
