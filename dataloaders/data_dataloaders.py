@@ -158,9 +158,6 @@ def dataloader_activity_train(args):
         features_path=args.features_path,
         max_words=args.max_words,
         feature_framerate=args.feature_framerate,
-        max_frames=args.max_frames,
-        frame_order=args.train_frame_order,
-        slice_framepos=args.slice_framepos,
     )
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(activity_dataset)
@@ -183,10 +180,6 @@ def dataloader_activity_test(args, tokenizer, subset="test"):
         features_path=args.features_path,
         max_words=args.max_words,
         feature_framerate=args.feature_framerate,
-        tokenizer=tokenizer,
-        max_frames=args.max_frames,
-        frame_order=args.eval_frame_order,
-        slice_framepos=args.slice_framepos,
     )
     dataloader_msrvtt = DataLoader(
         activity_testset,
