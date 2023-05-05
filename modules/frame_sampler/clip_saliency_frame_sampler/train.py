@@ -20,7 +20,7 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
             frames = frames.to(device)
             descriptions = descriptions.to(device)
 
-            student_scores = student(frames).squeeze()
+            student_scores = student(frames)
 
             with torch.no_grad():
                 teacher_scores = teacher(frames, descriptions)

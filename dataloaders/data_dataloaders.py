@@ -151,14 +151,13 @@ def dataloader_lsmdc_test(args, tokenizer, subset="test"):
     return dataloader_msrvtt, len(lsmdc_testset)
 
 
-def dataloader_activity_train(args, tokenizer):
+def dataloader_activity_train(args):
     activity_dataset = ActivityNet_DataLoader(
         subset="train",
         data_path=args.data_path,
         features_path=args.features_path,
         max_words=args.max_words,
         feature_framerate=args.feature_framerate,
-        tokenizer=tokenizer,
         max_frames=args.max_frames,
         frame_order=args.train_frame_order,
         slice_framepos=args.slice_framepos,
