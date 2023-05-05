@@ -44,7 +44,7 @@ class CLIPTeacher(nn.Module):
         
         similarities = torch.matmul(text_features, image_features.T)
 
-        max_similarity = torch.max(similarities, axis=0)
+        max_similarity = torch.max(similarities, axis=0).values
 
         return max_similarity
 
