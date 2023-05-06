@@ -1,5 +1,6 @@
 import os
 import pytube
+import random
 
 
 def download_video_from_youtube(video_id_or_url, destination_path=None, video_name=None, retry_count=3, use_oauth=False):
@@ -25,3 +26,15 @@ def download_video_from_youtube(video_id_or_url, destination_path=None, video_na
     except:
         download_video_from_youtube(
             video_id_or_url, destination_path, video_name, retry_count-1)
+
+
+def choice_video(data, length, var=20):
+
+    #TODO: It's work just for ActivityNet, format of json files of others  must be check
+
+    duration = -1
+    video_ids = list(data.keys())
+    while not(duration > length - var and duration < length + var):
+        id = random.choice(video_ids)
+        duration = data[id]["duration"]
+    return id
