@@ -5,10 +5,11 @@ from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normal
 
 
 class RawVideoExtractorCV2():
-    def __init__(self, centercrop=False, framerate=-1, size=224 ):
+    def __init__(self, centercrop=False, framerate=-1, size=224 , do_preprocess=True):
         self.centercrop = centercrop
         self.framerate = framerate
         self.transform = self._transform(size)
+        self.do_preprocess = do_preprocess
 
     def _transform(self, n_px):
         return Compose([
@@ -50,7 +51,9 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        images.append(self.transform(Image.fromarray(frame_rgb)))
+                        image = Image.fromarray(frame_rgb) 
+                        image = self.transform(image) if self.do_preprocess else image
+                        images.append(image)
 
             else: 
                 break
