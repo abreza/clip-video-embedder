@@ -29,7 +29,7 @@ def plot_text_image_pallet(model, processor, images, sentences):
 
     for x in range(similarity.shape[1]):
         for y in range(similarity.shape[0]):
-            plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
+            plt.text(x, y, f"{similarity[y, x]:.2f}", ha="center", va="center", size=10)
 
     for side in ["left", "top", "right", "bottom"]:
         plt.gca().spines[side].set_visible(False)
@@ -62,7 +62,7 @@ def plot_image_image_pallet(model, processor, images):
 
     for x in range(similarity.shape[1]):
         for y in range(similarity.shape[0]):
-            plt.text(x, y, f"{similarity[y, x]:.3f}", ha="center", va="center", size=12)
+            plt.text(x, y, f"{similarity[y, x]:.2f}", ha="center", va="center", size=10)
 
     for side in ["left", "top", "right", "bottom"]:
         plt.gca().spines[side].set_visible(False)
