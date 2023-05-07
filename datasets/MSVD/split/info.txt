@@ -1,0 +1,5 @@
+Training splits
+
+	train_list.txt (1200 videos)
+	val_list.txt   (100 videos)
+	test_list.txt  (670 videos)
