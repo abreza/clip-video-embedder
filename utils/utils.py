@@ -27,3 +27,34 @@ def write_results_to_json(key_names, description, similarity_scores, timestamps,
     data = {"descs": descs, "results": results}
     with open(output_file, "w") as f:
         json.dump(data, f, indent=indent)
+
+
+def load_dataset(dataset_name):
+  if dataset_name == "ActivityNet":
+    with open('datasets/ActivityNet/train.json') as f:
+      loaded_file = json.load(f)
+
+      data = {}
+      for id in loaded_file:
+        instance = {}
+        instance['start'] = 0.0
+        instance['end'] = loaded_file[id]['duration']
+        instance['descriptions'] = loaded_file[id]['sentences']
+
+        data[id] = instance
+
+  elif dataset_name == "MSVD":
+    with open('datasets/MSVD/data.json') as f:
+      loaded_file = json.load(f)
+
+      data = {}
+      for video_info in loaded_file:
+        instance = {}
+        id = video_info['link']
+        instance['start'] = video_info['start']
+        instance['end'] = video_info['end']
+        instance['descriptions'] = video_info['description']
+
+        data[id] = instance
+
+  return data
