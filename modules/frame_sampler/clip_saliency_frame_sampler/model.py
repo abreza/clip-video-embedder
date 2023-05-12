@@ -34,17 +34,18 @@ class CLIPTeacher(nn.Module):
 
     def forward(self, preprocessed_images, descriptions):
 
-        text_inputs = self.processor(text=descriptions, return_tensors="pt", padding=True).to(self.device)
-        
-        image_features = self.model.get_image_features(preprocessed_images).float()
+        text_inputs = self.processor(
+            text=descriptions, return_tensors="pt", padding=True).to(self.device)
+
+        image_features = self.model.get_image_features(
+            preprocessed_images).float()
         text_features = self.model.get_text_features(**text_inputs).float()
-        
+
         image_features /= image_features.norm(dim=-1, keepdim=True)
-        text_features  /= text_features.norm(dim=-1, keepdim=True)
-        
+        text_features /= text_features.norm(dim=-1, keepdim=True)
+
         similarities = torch.matmul(text_features, image_features.T)
 
         max_similarity = torch.max(similarities, axis=0).values
 
         return max_similarity
-

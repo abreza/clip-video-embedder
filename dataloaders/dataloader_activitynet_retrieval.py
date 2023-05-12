@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 import json
 from dataloaders.rawvideo_util import RawVideoExtractor
 
+
 class ActivityNet_DataLoader(Dataset):
     def __init__(
             self,
@@ -35,7 +36,8 @@ class ActivityNet_DataLoader(Dataset):
                 ]
             })
 
-        self.rawVideoExtractor = RawVideoExtractor(framerate=feature_framerate, size=image_resolution)
+        self.rawVideoExtractor = RawVideoExtractor(
+            framerate=feature_framerate, size=image_resolution)
 
     def __len__(self):
         return len(self.list_data)

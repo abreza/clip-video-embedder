@@ -5,7 +5,7 @@ from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normal
 
 
 class RawVideoExtractorCV2():
-    def __init__(self, centercrop=False, framerate=-1, size=224 , do_preprocess=True):
+    def __init__(self, centercrop=False, framerate=-1, size=224, do_preprocess=True):
         self.centercrop = centercrop
         self.framerate = framerate
         self.transform = self._transform(size)
@@ -17,7 +17,8 @@ class RawVideoExtractorCV2():
             CenterCrop(n_px),
             # lambda image: image.convert("RGB"),
             ToTensor(),
-            Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
+            Normalize((0.48145466, 0.4578275, 0.40821073),
+                      (0.26862954, 0.26130258, 0.27577711)),
         ])
 
     def video_to_tensor(self, video_file, sample_fp=0, start_time=None, end_time=None):
@@ -31,7 +32,7 @@ class RawVideoExtractorCV2():
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         video_fps = cap.get(cv2.CAP_PROP_FPS)
 
-        start_frame = int(start_time * video_fps) if start_time else  0
+        start_frame = int(start_time * video_fps) if start_time else 0
         end_frame = int(end_time * video_fps) if end_time else frame_count - 1
 
         interval = 1
@@ -51,11 +52,12 @@ class RawVideoExtractorCV2():
                 if i >= start_frame and i <= end_frame:
                     if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        image = Image.fromarray(frame_rgb) 
-                        image = self.transform(image) if self.do_preprocess else image
+                        image = Image.fromarray(frame_rgb)
+                        image = self.transform(
+                            image) if self.do_preprocess else image
                         images.append(image)
 
-            else: 
+            else:
                 break
 
         cap.release()
