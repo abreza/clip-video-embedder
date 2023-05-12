@@ -35,5 +35,5 @@ def choice_video(data, length):
     video_ids = list(data.keys())
     while not(duration > length * 0.85 and duration < length *1.2):
         id = random.choice(video_ids)
-        duration = data[id]["duration"]
+        duration = data[id]['end'] - data[id]['start']
     return id
