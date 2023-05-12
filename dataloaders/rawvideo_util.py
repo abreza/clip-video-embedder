@@ -8,8 +8,8 @@ class RawVideoExtractorCV2():
     def __init__(self, centercrop=False, framerate=-1, size=224, to_tensor=True):
         self.centercrop = centercrop
         self.framerate = framerate
-        self.transform = self._transform(size)
         self.to_tensor = to_tensor
+        self.transform = self._transform(size)
 
     def _transform(self, n_px):
         if self.to_tensor:
