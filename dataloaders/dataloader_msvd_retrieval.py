@@ -14,7 +14,7 @@ class MSVD_DataLoader(Dataset):
             data_path,
             features_path,
             max_words=30,
-            feature_framerate=1.0,
+            feature_framerate=10.0,
             image_resolution=224,
     ):
         self.data_path = data_path
