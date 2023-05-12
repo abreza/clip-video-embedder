@@ -81,21 +81,17 @@ def dataloader_msvd_train(args):
     return dataloader, len(msvd_dataset)
 
 
-def dataloader_msvd_test(args, tokenizer, subset="test"):
+def dataloader_msvd_test(args, subset="test"):
     msvd_testset = MSVD_DataLoader(
         subset=subset,
         data_path=args.data_path,
         features_path=args.features_path,
         max_words=args.max_words,
         feature_framerate=args.feature_framerate,
-        tokenizer=tokenizer,
-        max_frames=args.max_frames,
-        frame_order=args.eval_frame_order,
-        slice_framepos=args.slice_framepos,
     )
     dataloader_msrvtt = DataLoader(
         msvd_testset,
-        batch_size=args.batch_size_val,
+        batch_size=args.batch_size,
         num_workers=args.num_thread_reader,
         shuffle=False,
         drop_last=False,
