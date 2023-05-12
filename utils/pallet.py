@@ -21,7 +21,11 @@ def plot_text_image_pallet(model, processor, images, sentences):
 
     plt.figure(figsize=(10, 10))
     plt.imshow(similarity, vmin=np.min(similarity), vmax=np.max(similarity))
-    plt.yticks(range(similarity.shape[0]), sentences, fontsize=18)
+
+    if similarity.shape[1] > 15:
+        plt.yticks([])
+    else:
+        plt.yticks(range(similarity.shape[0]), sentences, fontsize=18)
     plt.xticks([])
 
     for i, image in enumerate(images):
