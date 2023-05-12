@@ -1,4 +1,5 @@
 import os
+import json
 import pytube
 import random
 
@@ -29,8 +30,6 @@ def download_video_from_youtube(video_id_or_url, destination_path=None, video_na
 
 
 def choice_video(data, length):
-
-    #TODO: It's work just for ActivityNet, format of json files of others  must be check
 
     duration = -1
     video_ids = list(data.keys())
