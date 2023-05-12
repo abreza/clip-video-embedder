@@ -85,12 +85,10 @@ def plot_image_image_pallet(model, processor, images):
 def plot_clip_similarities(outputs, sentences,
                        timestamps=[], framerate=1,
                        force_separate_subplots = False,
-                       show_concate_descriptions_plot=False,
                        show_max_plot = False,
                        show_each_plot=False):
            
-    concat_output = outputs[0].tolist()
-    descriptions_output = np.array([output.tolist() for output in outputs[1:]])
+    descriptions_output = np.array([output.tolist() for output in outputs])
 
     t = np.arange(outputs.shape[1])
 
@@ -117,10 +115,7 @@ def plot_clip_similarities(outputs, sentences,
     else:
         
         fig , ax = plt.subplots(1, 1, figsize=(plot_w, 4))
-
-        if show_concate_descriptions_plot:
-            ax.plot(t/ framerate, concat_output, label='Concatenated Descriptions')
-
+        
         if show_max_plot:
             max_of_lists = np.max(descriptions_output[:len(sentences)], axis=0)
             ax.plot(t/ framerate, max_of_lists, label=f'Max of {len(sentences)} Plots')
