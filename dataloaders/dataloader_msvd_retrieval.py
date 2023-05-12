@@ -65,5 +65,5 @@ class MSVD_DataLoader(Dataset):
         [start, end] = data['segments'][0]['timestamp']
         descriptions = [item['description'] for item in data['segments']]
         video_path = f"{self.features_path}/{data['youtube_video_id']}_{start}_{end}.avi"
-        images = self.rawVideoExtractor.get_video_data(video_path, start, end)
+        images = self.rawVideoExtractor.get_video_data(video_path)
         return images, descriptions
