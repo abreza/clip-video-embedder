@@ -25,6 +25,9 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
         optimizer.zero_grad()
 
         for i, (frames, descriptions) in enumerate(train_dataloader):
+            if len(frames) == 0:
+                continue
+
             running_loss = 0.0
             frames = torch.squeeze(torch.tensor(
                 np.stack(frames)), dim=1).to(device)
