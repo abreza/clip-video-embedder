@@ -18,9 +18,16 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
     train_losses = []
     val_losses = []
 
+    update_every = 5
+
     for epoch in range(epochs):
         epoch_loss = 0
+        optimizer.zero_grad()
+
         for i, (frames, descriptions) in enumerate(train_dataloader):
+            if len(frames) == 0:
+                continue
+
             running_loss = 0.0
             frames = torch.squeeze(torch.tensor(
                 np.stack(frames)), dim=1).to(device)
@@ -31,19 +38,26 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
 
             student_scores = student(frames)
 
-            optimizer.zero_grad()
             loss = criterion(student_scores, teacher_scores)
             loss.backward()
-            optimizer.step()
 
             calculated_loss = loss.item()
             running_loss += calculated_loss
             epoch_loss += calculated_loss
 
+            if (i + 1) % update_every == 0:
+                optimizer.step()
+                optimizer.zero_grad()
+
             if (i + 1) % print_every == 0:
                 print(
                     f'Epoch: {epoch + 1}, Batch: {i + 1}, Avg. Loss: {running_loss / print_every}')
                 running_loss = 0.0
+
+        # if the number of batches is not a multiple of 'update_every', update parameters for the remaining batches
+        if len(train_dataloader) % update_every != 0:
+            optimizer.step()
+            optimizer.zero_grad()
 
         train_loss = epoch_loss / len(train_dataloader)
         train_losses.append(train_loss)
