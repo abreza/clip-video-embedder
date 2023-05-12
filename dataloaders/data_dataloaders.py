@@ -58,7 +58,7 @@ def dataloader_msrvtt_test(args, tokenizer, subset="test"):
     return dataloader_msrvtt, len(msrvtt_testset)
 
 
-def dataloader_msvd_train(args, tokenizer):
+def dataloader_msvd_train(args):
     msvd_dataset = MSVD_DataLoader(
         subset="train",
         data_path=args.data_path,
