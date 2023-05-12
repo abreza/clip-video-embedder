@@ -9,18 +9,39 @@ class SaliencyNet(nn.Module):
     def __init__(self):
         super(SaliencyNet, self).__init__()
         self.model = timm.create_model('resnet50', pretrained=True)
-        self.fc1 = nn.Linear(100352, 512)
-        self.fc2 = nn.Linear(512, 1)
+
+        # Freeze the early layers of the model
+        for param in self.model.parameters():
+            param.requires_grad = False
+        for param in self.model.layer4.parameters():
+            param.requires_grad = True
+        for param in self.model.layer3.parameters():
+            param.requires_grad = True
+
+        # Increase the depth of the model
+        self.fc1 = nn.Linear(100352, 1024)
+        self.dropout = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(1024, 512)
+        self.fc3 = nn.Linear(512, 1)
+
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, preprocessed_images):
         features = self.model.forward_features(preprocessed_images)
         x = features.view(features.size(0), -1)
+
         x = self.fc1(x)
         x = self.relu(x)
+        x = self.dropout(x)
+
         x = self.fc2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.fc3(x)
         x = self.sigmoid(x)
+
         return torch.flatten(x)
 
 
