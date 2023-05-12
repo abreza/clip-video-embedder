@@ -82,12 +82,10 @@ def plot_image_image_pallet(model, processor, images):
     plt.xlim([-1.6, similarity.shape[1] - 0.5]);
     plt.ylim([similarity.shape[0] - 0.5, -1.6]);
 
-def plot_clip_similarities(outputs, sentences, random_sentences=None,
+def plot_clip_similarities(outputs, sentences,
                        timestamps=[], framerate=1,
                        force_separate_subplots = False,
-                       show_random_plots = False,
                        show_concate_descriptions_plot=False,
-                       show_average_plot = False, 
                        show_max_plot = False,
                        show_each_plot=False):
            
@@ -100,14 +98,13 @@ def plot_clip_similarities(outputs, sentences, random_sentences=None,
     interval_length = 1 if _temp<25 else 2 if _temp < 50 else 5 if _temp < 100 else 10 if _temp <260 else 10 if _temp<360 else 20
     plot_w = 12 if _temp<150 else 18 if _temp<350 else 22
 
-
     if force_separate_subplots:
 
-        number_of_subplots = len(sentences)+len(random_sentences) if random_sentences and show_random_plots else len(sentences)
+        number_of_subplots = len(sentences)
 
         fig , axs = plt.subplots(number_of_subplots, 1, figsize=(plot_w, number_of_subplots*2))
 
-        for i,rasentence in enumerate(sentences):
+        for i in range(len(sentences)):
           axs[i].plot(t/ framerate, descriptions_output[i])
           axs[i].set_title(sentences[i])
           axs[i].set_xlabel("Time (s)")
@@ -117,16 +114,6 @@ def plot_clip_similarities(outputs, sentences, random_sentences=None,
           axs[i].set_xticks(np.arange(0, round(len(t)/ framerate) + 1, interval_length))
 
 
-        if random_sentences and show_random_plots:        
-          for i, random_sent in enumerate(random_sentences):
-            index = i + len(sentences)
-            axs[index].plot(t/ framerate, descriptions_output[index], color='orange')
-            axs[index].set_title('Random Sentence: '+random_sent)
-            axs[index].set_xlabel("Time (s)")
-            axs[index].set_ylabel("similarity")
-            axs[index].set_xticks(np.arange(0, round(len(t)/ framerate) + 1, interval_length))
-
-
     else:
         
         fig , ax = plt.subplots(1, 1, figsize=(plot_w, 4))
@@ -134,10 +121,6 @@ def plot_clip_similarities(outputs, sentences, random_sentences=None,
         if show_concate_descriptions_plot:
             ax.plot(t/ framerate, concat_output, label='Concatenated Descriptions')
 
-        if show_average_plot:
-            mean_of_lists = np.mean(descriptions_output[:len(sentences)], axis=0)
-            ax.plot(t/ framerate, mean_of_lists, label=f'Average of {len(sentences)} Plots')
-        
         if show_max_plot:
             max_of_lists = np.max(descriptions_output[:len(sentences)], axis=0)
             ax.plot(t/ framerate, max_of_lists, label=f'Max of {len(sentences)} Plots')
@@ -145,15 +128,6 @@ def plot_clip_similarities(outputs, sentences, random_sentences=None,
         if show_each_plot:
             for i in range(len(sentences)):
                 ax.plot(t/ framerate, descriptions_output[i], label=f'Description {i+1}')
-
-        if random_sentences and show_random_plots:
-          if len(random_sentences) == 1:
-            ax.plot(t/ framerate, descriptions_output[len(sentences)], label=f'Random Description')
-          
-          else:  
-            for i in range(len(random_sentences)):
-              index = len(sentences)+i
-              ax.plot(t/ framerate, descriptions_output[index], label=f'Random Description {i+1}')
 
         ax.set_title("CLIP Text-Frame Cosine Similarity")
         ax.set_xlabel("Time (s)")
@@ -163,6 +137,7 @@ def plot_clip_similarities(outputs, sentences, random_sentences=None,
 
     fig.subplots_adjust(hspace=1)
     plt.show()
+
 
 def plot_student_teacher_scores(teacher_scores, student_scores,framerate):
               
