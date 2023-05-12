@@ -3,6 +3,7 @@ import torch.nn as nn
 import numpy as np
 
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 
 def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, val_dataloader: DataLoader, epochs: int, optimizer, device):
@@ -20,12 +21,13 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
 
     update_every = 5
 
-    for epoch in range(epochs):
+    for epoch in tqdm(range(epochs), desc="Epochs"):
         epoch_loss = 0
         optimizer.zero_grad()
 
-        for i, (frames, descriptions) in enumerate(train_dataloader):
+        for i, (frames, descriptions) in tqdm(enumerate(train_dataloader), desc="Training Batches", leave=False):
             if len(frames) == 0:
+                print(f'video {i} has not any loaded frame')
                 continue
 
             running_loss = 0.0
@@ -67,7 +69,7 @@ def train_salient_frame_sampler(teacher, student, train_dataloader: DataLoader, 
 
         with torch.no_grad():
             running_val_loss = 0.0
-            for i, (val_frames, val_descriptions) in enumerate(val_dataloader):
+            for i, (val_frames, val_descriptions) in tqdm(enumerate(val_dataloader), desc="Validation Batches", leave=False):
                 val_frames = torch.squeeze(torch.tensor(
                     np.stack(val_frames)), dim=1).to(device)
                 val_descriptions = [desc[0] for desc in val_descriptions]
