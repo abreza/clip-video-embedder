@@ -55,8 +55,7 @@ class RawVideoExtractorCV2():
                     if len(images) * interval < i - start_frame:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         image = Image.fromarray(frame_rgb)
-                        image = self.transform(
-                            image) if self.do_preprocess else image
+                        image = self.transform(image)
                         images.append(image)
 
             else:
