@@ -25,8 +25,7 @@ class RawVideoExtractorCV2():
 
     def video_to_tensor(self, video_file, sample_fp=0, start_time=None, end_time=None):
         if start_time is not None or end_time is not None:
-            assert isinstance(start_time, int) and isinstance(end_time, int) \
-                and start_time > -1 and end_time > start_time
+            assert start_time > -1 and end_time > start_time
         assert sample_fp > -1
 
         cap = cv2.VideoCapture(video_file)
