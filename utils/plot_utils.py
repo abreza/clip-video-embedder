@@ -82,15 +82,13 @@ def plot_image_image_pallet(model, processor, images):
     plt.xlim([-1.6, similarity.shape[1] - 0.5]);
     plt.ylim([similarity.shape[0] - 0.5, -1.6]);
 
-def plot_clip_similarities(outputs, sentences,
+def plot_clip_similarities(similarity_scores, sentences,
                        timestamps=[], framerate=1,
                        force_separate_subplots = False,
                        show_max_plot = False,
                        show_each_plot=False):
            
-    descriptions_output = np.array([output.tolist() for output in outputs])
-
-    t = np.arange(outputs.shape[1])
+    t = np.arange(similarity_scores.shape[1])
 
     _temp = len(t)/framerate
     interval_length = 1 if _temp<25 else 2 if _temp < 50 else 5 if _temp < 100 else 10 if _temp <260 else 10 if _temp<360 else 20
@@ -103,7 +101,7 @@ def plot_clip_similarities(outputs, sentences,
         fig , axs = plt.subplots(number_of_subplots, 1, figsize=(plot_w, number_of_subplots*2))
 
         for i in range(len(sentences)):
-          axs[i].plot(t/ framerate, descriptions_output[i])
+          axs[i].plot(t/ framerate, similarity_scores[i])
           axs[i].set_title(sentences[i])
           axs[i].set_xlabel("Time (s)")
           axs[i].set_ylabel("Similarity")
@@ -117,12 +115,12 @@ def plot_clip_similarities(outputs, sentences,
         fig , ax = plt.subplots(1, 1, figsize=(plot_w, 4))
         
         if show_max_plot:
-            max_of_lists = np.max(descriptions_output[:len(sentences)], axis=0)
+            max_of_lists = np.max(similarity_scores[:len(sentences)], axis=0)
             ax.plot(t/ framerate, max_of_lists, label=f'Max of {len(sentences)} Plots')
 
         if show_each_plot:
             for i in range(len(sentences)):
-                ax.plot(t/ framerate, descriptions_output[i], label=f'Description {i+1}')
+                ax.plot(t/ framerate, similarity_scores[i], label=f'Description {i+1}')
 
         ax.set_title("CLIP Text-Frame Cosine Similarity")
         ax.set_xlabel("Time (s)")
