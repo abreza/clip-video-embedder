@@ -87,27 +87,26 @@ def plot_clip_similarities(similarity_scores, sentences,
                        force_separate_subplots = False,
                        show_max_plot = False,
                        show_each_plot=False):
-           
+
+    n_descriptions = similarity_scores.shape[0]    
     t = np.arange(similarity_scores.shape[1])
 
-    _temp = len(t)/framerate
-    interval_length = 1 if _temp<25 else 2 if _temp < 50 else 5 if _temp < 100 else 10 if _temp <260 else 10 if _temp<360 else 20
-    plot_w = 12 if _temp<150 else 18 if _temp<350 else 22
+    video_length = len(t)/framerate
+    interval_length = 1 if video_length<25 else 2 if video_length < 50 else 5 if video_length < 100 else 10 if video_length <260 else 10 if _temp<360 else 20
+    plot_w = 12 if video_length<150 else 18 if video_length<350 else 22
 
     if force_separate_subplots:
 
-        number_of_subplots = len(sentences)
+        fig , axs = plt.subplots(n_descriptions, 1, figsize=(plot_w, n_descriptions*2))
 
-        fig , axs = plt.subplots(number_of_subplots, 1, figsize=(plot_w, number_of_subplots*2))
-
-        for i in range(len(sentences)):
+        for i in range(n_descriptions):
           axs[i].plot(t/ framerate, similarity_scores[i])
           axs[i].set_title(sentences[i])
           axs[i].set_xlabel("Time (s)")
           axs[i].set_ylabel("Similarity")
           axs[i].axvline(x=timestamps[i][0] , color='r', linestyle='--')
           axs[i].axvline(x=timestamps[i][1] , color='r', linestyle='--')
-          axs[i].set_xticks(np.arange(0, round(len(t)/ framerate) + 1, interval_length))
+          axs[i].set_xticks(np.arange(0, round(video_length) + 1, interval_length))
 
 
     else:
@@ -115,11 +114,11 @@ def plot_clip_similarities(similarity_scores, sentences,
         fig , ax = plt.subplots(1, 1, figsize=(plot_w, 4))
         
         if show_max_plot:
-            max_of_lists = np.max(similarity_scores[:len(sentences)], axis=0)
-            ax.plot(t/ framerate, max_of_lists, label=f'Max of {len(sentences)} Plots')
+            max_of_lists = np.max(similarity_scores], axis=0)
+            ax.plot(t/ framerate, max_of_lists, label=f'Max of {n_descriptions} Plots')
 
         if show_each_plot:
-            for i in range(len(sentences)):
+            for i in range(n_descriptions):
                 ax.plot(t/ framerate, similarity_scores[i], label=f'Description {i+1}')
 
         ax.set_title("CLIP Text-Frame Cosine Similarity")
