@@ -116,7 +116,7 @@ def plot_clip_similarities(similarity_scores, sentences,
         fig , ax = plt.subplots(1, 1, figsize=(plot_w, 4))
         
         if show_max_plot:
-            max_of_lists = np.max(similarity_scores], axis=0)
+            max_of_lists = np.max(similarity_scores, axis=0)
             ax.plot(t/ framerate, max_of_lists, label=f'Max of {n_descriptions} Plots')
 
         if show_each_plot:
