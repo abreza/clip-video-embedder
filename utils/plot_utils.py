@@ -88,6 +88,8 @@ def plot_clip_similarities(similarity_scores, sentences,
                        show_max_plot = False,
                        show_each_plot=False):
 
+    similarity_scores = np.array([similarity_score.tolist() for similarity_score in similarity_scores])
+
     n_descriptions = similarity_scores.shape[0]    
     t = np.arange(similarity_scores.shape[1])
 
