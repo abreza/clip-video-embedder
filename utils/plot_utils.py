@@ -94,7 +94,7 @@ def plot_clip_similarities(similarity_scores, sentences,
     t = np.arange(similarity_scores.shape[1])
 
     video_length = len(t)/framerate
-    interval_length = 1 if video_length<25 else 2 if video_length < 50 else 5 if video_length < 100 else 10 if video_length <260 else 10 if _temp<360 else 20
+    interval_length = 1 if video_length<25 else 2 if video_length < 50 else 5 if video_length < 100 else 10 if video_length <260 else 10 if video_length<360 else 20
     plot_w = 12 if video_length<150 else 18 if video_length<350 else 22
 
     if force_separate_subplots:
