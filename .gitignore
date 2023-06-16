@@ -3,4 +3,7 @@ venv/
 **/__pycache__/
 **/__pycache__/
 ckpts/
+NEW/
+clip-model/
+clip-processor/
 data/
