@@ -1,8 +1,7 @@
 import numpy as np
 from PIL import Image
 import cv2
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-
+from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize, InterpolationMode
 
 class RawVideoExtractorCV2():
     def __init__(self, centercrop=False, framerate=-1, size=224, to_tensor=True):
@@ -15,13 +14,13 @@ class RawVideoExtractorCV2():
         if self.to_tensor:
 
             return Compose([
-                Resize(n_px, interpolation=Image.BICUBIC),
+                Resize(n_px, interpolation=InterpolationMode.BICUBIC),
                 CenterCrop(n_px), ToTensor(),
                 Normalize((0.48145466, 0.4578275, 0.40821073),
                         (0.26862954, 0.26130258, 0.27577711))])
         
         else:
-            return Compose([Resize(n_px, interpolation=Image.BICUBIC),CenterCrop(n_px)])
+            return Compose([Resize(n_px, interpolation=InterpolationMode.BICUBIC),CenterCrop(n_px)])
 
     def video_to_tensor(self, video_file, sample_fp=0, start_time=None, end_time=None):
         if start_time is not None or end_time is not None:
