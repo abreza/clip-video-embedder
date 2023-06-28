@@ -8,7 +8,7 @@ class ActivityNet_DataLoader(Dataset):
         self.max_frames = max_frames
 
         self.subset = subset
-        assert self.subset in ["train", "val"]
+        assert self.subset in ["train", "test"]
 
         with open(data_path) as f:
             self.data = json.load(f)
