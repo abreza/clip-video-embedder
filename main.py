@@ -3,39 +3,41 @@ import torch
 from modules.frame_sampler.clip_saliency_frame_sampler.train import train_salient_frame_sampler
 from modules.frame_sampler.clip_saliency_frame_sampler.model import SaliencyNet, CLIPTeacher
 
-from utils.dotdict import DotDict
-from dataloaders.data_dataloaders import dataloader_msvd_train
+from torch.utils.data import DataLoader
+from dataloaders.dataloader_activitynet_for_BCE import VideoDescriptionDataloader
+
 
 
 def main():
-
-    args = DotDict(dict(data_path='/content/clip-video-embedder/datasets/MSVD/data.json',
-                        features_path='/content/MSVD',
-                        max_words=77,
-                        feature_framerate=1,
-                        max_frames=100,
-                        train_frame_order=0,
-                        slice_framepos=2,
-                        batch_size=1,
-                        n_gpu=1,
-                        num_thread_reader=0))
-
-    train_dataloader, train_length = dataloader_msvd_train(args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     torch.cuda.empty_cache()
 
-    teacher = CLIPTeacher(device)
     student = SaliencyNet()
 
     optimizer = torch.optim.Adam(student.parameters(), lr=0.0001)
 
-    val_dataloader = train_dataloader
-    epochs = 1
+    epochs = 10
+
+    train_json_file = "/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/train.json"
+    train_frame_dir = "/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/train"
+
+    val_json_file = "/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/val_1.json"
+    val_frame_dir = "/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/val_1"
+
+
+    gt_scores_file = "/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/CLIP-guided/CLIP-guided_video_summary_dataset_train.json"
+
+    train_dataset = VideoDescriptionDataloader(train_json_file, train_frame_dir, gt_scores_file)
+    train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+
+    val_dataset = VideoDescriptionDataloader(val_json_file, val_frame_dir, gt_scores_file)
+    val_dataloader = DataLoader(val_dataset, batch_size=1, shuffle=True)
+
 
     train_salient_frame_sampler(
-        teacher, student, train_dataloader, val_dataloader, epochs, optimizer, device)
+        student, train_dataloader, val_dataloader, epochs, optimizer, device)
 
 
 if __name__ == '__main__':

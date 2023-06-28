@@ -1,25 +1,23 @@
 import timm
 import torch
-import numpy as np
 import torch.nn as nn
-from transformers import CLIPProcessor, CLIPModel
+from transformers import CLIPModel
 
 
 class SaliencyNet(nn.Module):
     def __init__(self):
         super(SaliencyNet, self).__init__()
-        self.model = timm.create_model('resnet50', pretrained=True)
+        self.pretrained = timm.create_model('resnet18', pretrained=True)
 
         # Freeze the early layers of the model
-        for param in self.model.parameters():
+        for param in self.pretrained.parameters():
             param.requires_grad = False
-        for param in self.model.layer4.parameters():
+        for param in self.pretrained.layer4.parameters():
             param.requires_grad = True
-        for param in self.model.layer3.parameters():
+        for param in self.pretrained.layer3.parameters():
             param.requires_grad = True
 
-        # Increase the depth of the model
-        self.fc1 = nn.Linear(100352, 1024)
+        self.fc1 = nn.Linear(512*7*7, 1024) #resnet50 2048*7*7
         self.dropout = nn.Dropout(0.5)
         self.fc2 = nn.Linear(1024, 512)
         self.fc3 = nn.Linear(512, 1)
@@ -27,8 +25,9 @@ class SaliencyNet(nn.Module):
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
+
     def forward(self, preprocessed_images):
-        features = self.model.forward_features(preprocessed_images)
+        features = self.pretrained.forward_features(preprocessed_images)
         x = features.view(features.size(0), -1)
 
         x = self.fc1(x)
@@ -48,9 +47,7 @@ class SaliencyNet(nn.Module):
 class CLIPTeacher(nn.Module):
     def __init__(self, device):
         super(CLIPTeacher, self).__init__()
-        self.model = CLIPModel.from_pretrained('openai/clip-vit-large-patch14')
-        self.processor = CLIPProcessor.from_pretrained(
-            'openai/clip-vit-large-patch14')
+        self.model = CLIPModel.from_pretrained('/media/external_10TB/10TB/p_haghighi/clip-model')
         self.device = device
 
     def forward(self, preprocessed_images, descriptions):
