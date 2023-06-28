@@ -7,3 +7,5 @@ NEW/
 clip-model/
 clip-processor/
 data/
+saved_model/
+training_logs.txt
