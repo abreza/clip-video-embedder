@@ -62,7 +62,7 @@ def get_similarity(use_gpt_prompts):
     output_json = '/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/CLIP-guided/'
     output_json += 'gpt_prompt_gt_' if use_gpt_prompts else 'template_prompt_gt_'
         
-    for mode in ['train', 'val1']:
+    for mode in ['train', 'val_1']:
 
         pt_files = os.listdir(os.path.join(video_dir, mode))
 

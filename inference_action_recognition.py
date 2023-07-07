@@ -6,7 +6,7 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 
 
-saliency_file = "/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/CLIP-guided/by labels/gpt_prompt_gt_val1.json"
+saliency_file = "/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/CLIP-guided/by labels/gpt_prompt_gt_val_1.json"
 sampled_frames_dir = "/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/val_1"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

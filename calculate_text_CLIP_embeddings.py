@@ -16,13 +16,14 @@ processor = CLIPProcessor.from_pretrained('/media/external_10TB/10TB/p_haghighi/
 
 print(f'The model successfully loaded on {device}.')
 
-split = 'val1' #'train'
+split = 'val_1' #'train'
 descriptions_file = f'/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/{split}.json'
 descripiton_embeddings_dir = f"/media/external_10TB/10TB/p_haghighi/ActivityNet/CLIP_embeddings/description/{split}"
 
 with open(descriptions_file, 'r') as f:
     data = json.load(f)
     video_ids = data.keys()
+    
 def get_text_embedding(sentences):
     max_seq_len = 75
     while True:

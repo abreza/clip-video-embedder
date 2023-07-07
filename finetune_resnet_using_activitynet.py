@@ -9,22 +9,23 @@ import torch.optim as optim
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms, models
+from PIL import Image
 from torchvision.io import read_image
 from torchvision import transforms
 from sklearn.preprocessing import LabelEncoder
 
 annotation_file = '/home/p_haghighi/clip-video-embedder/datasets/ActivityNet/activity_net.v1-3.min.json'
-saved_model_path = '/media/external_10TB/10TB/p_haghighi/saved_models/finetuned_resnet50_activitynet/'
+saved_model_path = '/media/external_10TB/10TB/p_haghighi/saved_models/finetuned_resnet50_activitynet/with_augmentation'
 
-# create a subdirectory with a name based on current time\
+# create a subdirectory with a name based on current time
 def get_time():
     time_offset = 3600 * (4) + 60 * (-2) + 1 * (-22)
     timestamp = time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime(time.time() + time_offset))
     return timestamp
 
 
-subdir_path = os.path.join(saved_model_path, get_time())
-os.makedirs(subdir_path, exist_ok=True)
+# subdir_path = os.path.join(saved_model_path, get_time())
+# os.makedirs(subdir_path, exist_ok=True)
 
 # Set up logging
 output_log_path = 'log_files/finetuned_resnet50_activitynet'
@@ -38,8 +39,17 @@ logging.basicConfig(
 )
 
 # Define transforms for the training and validation sets
-data_transform = transforms.Compose([
-        # transforms.ToTensor(),
+
+train_transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+        transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+
+val_transform = transforms.Compose([
+        transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
 
@@ -77,7 +87,7 @@ class ActivityNetDataset(Dataset):
     def __getitem__(self, idx):
         img_path = self.samples[idx]
         label = self.labels[idx]
-        image = read_image(img_path).float()
+        image = read_image(img_path).float() #Image.open(img_path)
         label = self.le.transform([label])[0] if label else -1  # use -1 or any suitable placeholder for test samples
         
         if self.transform:
@@ -88,16 +98,26 @@ class ActivityNetDataset(Dataset):
 
 def load_latest_checkpoint(model):
     # Find the latest saved model checkpoint
-    checkpoint_files = glob.glob(os.path.join(saved_model_path, 'model_epoch_*.pth'))
+    model_path = '/media/external_10TB/10TB/p_haghighi/saved_models/finetuned_resnet50_activitynet/without_augmentation'
+
+    checkpoint_files = glob.glob(os.path.join(model_path, 'model_epoch_*.pth'))
 
     if checkpoint_files:
-        latest_checkpoint_file = max(checkpoint_files, key=os.path.getctime)
+        runned_epoch_numbers = [int(file_path.split('_')[-1].replace('.pth', '')) for file_path in checkpoint_files]
+        
+        last_checkpoint_number  = max(runned_epoch_numbers)
+        latest_checkpoint_file = os.path.join(model_path, f'model_epoch_{last_checkpoint_number}.pth')
 
-        file_name_without_extension = os.path.splitext(latest_checkpoint_file)[0]
-        start_epoch = int(file_name_without_extension.split('_')[-1]) + 1
+        start_epoch = last_checkpoint_number + 1
 
         model_state_dict = torch.load(latest_checkpoint_file)
-        model.load_state_dict(model_state_dict)
+
+        new_state_dict = {}
+        for k, v in model_state_dict.items():
+            name = k.replace('module.', '') # remove 'module.' from the key
+            new_state_dict[name] = v
+            
+        model.load_state_dict(new_state_dict)
 
     else:
         start_epoch = 0
@@ -192,15 +212,14 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
         print(f'{get_time()}: Val Loss: {epoch_loss:.4f}\tAcc: {epoch_acc:.4f}')
 
 
-
 # Create training, validation and test datasets
-train_dataset = ActivityNetDataset('/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/train', annotation_file, 'training', data_transform)
-val_dataset = ActivityNetDataset('/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/val_1', annotation_file, 'validation', data_transform)
+train_dataset = ActivityNetDataset('/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/train', annotation_file, 'training', train_transform)
+val_dataset = ActivityNetDataset('/media/external_10TB/10TB/p_haghighi/ActivityNet/sampled_frames/val_1', annotation_file, 'validation', val_transform)
 # test_dataset = ActivityNetDataset('./sampled_frames/test', annotation_file, 'testing', data_transform)
 
 # Create training, validation and test dataloaders
-train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
-val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False, num_workers=8)
+train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4)
+val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False, num_workers=4)
 # test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=4)
 
 # Load pretrained ResNet-50 model
